@@ -1055,22 +1055,7 @@ class CAS_Client
 		$res = FALSE;
 		$validate_url = '';
 
-		if ( $this->wasPreviouslyAuthenticated() ) {
-			if($this->hasST() || $this->hasPT() || $this->hasSA()){
-				// User has a additional ticket but was already authenticated
-				phpCAS::trace('ticket was present and will be discarded, use renewAuthenticate()');
-				header('Location: '.$this->getURL());
-				phpCAS::trace( "Prepare redirect to remove ticket: ".$this->getURL() );
-				phpCAS::traceExit();
-				exit();
-			}else{
-				// the user has already (previously during the session) been
-				// authenticated, nothing to be done.
-				phpCAS::trace('user was already authenticated, no need to look for tickets');
-				$res = TRUE;
-			}
-		}
-		else {
+		if ( $this->hasST() || $this->hasPT() || $this->hasSA() ) {
 			if ( $this->hasST() ) {
 				// if a Service Ticket was given, validate it
 				phpCAS::trace('ST `'.$this->getST().'\' is present');
@@ -1148,6 +1133,21 @@ class CAS_Client
 					phpCAS::traceExit();
 					exit();
 				}
+			}
+		}
+		else if ( $this->wasPreviouslyAuthenticated() ) {
+			if($this->hasST() || $this->hasPT() || $this->hasSA()){
+				// User has a additional ticket but was already authenticated
+				phpCAS::trace('ticket was present and will be discarded, use renewAuthenticate()');
+				header('Location: '.$this->getURL());
+				phpCAS::trace( "Prepare redirect to remove ticket: ".$this->getURL() );
+				phpCAS::traceExit();
+				exit();
+			}else{
+				// the user has already (previously during the session) been
+				// authenticated, nothing to be done.
+				phpCAS::trace('user was already authenticated, no need to look for tickets');
+				$res = TRUE;
 			}
 		}
 
